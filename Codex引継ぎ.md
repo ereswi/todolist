@@ -8,10 +8,11 @@
 
 - 作業フォルダー: `C:\Users\User\Documents\ChatGPT\100分開発todolist`
 - 詳細仕様: [設計書.md](./設計書.md)
+- 実装開始時の依頼文: [Codex開始プロンプト.md](./Codex開始プロンプト.md)
 - このプロジェクトの会話と文書だけを前提とする。他プロジェクトや以前の会話の前提を持ち込まない。
 - 現在は設計書と引継ぎ資料を整備した段階。アプリ本体の実装・テスト・Pages公開は未実施。
 - ローカルGitは作成済み。初回コミットは `cfc1a0e`。実装着手時には最新履歴と作業ツリーの状態を確認する。
-- GitHubの保存先はユーザー作成済みの [ereswi/todolist](https://github.com/ereswi/todolist)。ローカルoriginに `https://github.com/ereswi/todolist.git` を設定済み。GitHubへのpushは未実施。
+- GitHubの保存先はユーザー作成済みの [ereswi/todolist](https://github.com/ereswi/todolist)。ローカルoriginに `https://github.com/ereswi/todolist.git` を設定済み。設計資料と既存のGit履歴はmainへpush済みで、ローカルmainはorigin/mainを追跡している。
 - Web公開先はGitHub Pages。予定URLは `https://ereswi.github.io/todolist/`。Pagesの設定・デプロイ・到達確認は未実施。
 - リポジトリはユーザーがpublicへ変更済み。2026年11月4日にGitHubプラグインでvisibilityがpublicであることを確認済み。
 - 見た目は開発担当に一任。仮名「ToDoリスト」で進められる。細部の確認待ちで止めない。
@@ -19,7 +20,7 @@
 
 会話の要件は設計書の「2.1」、実装用の補足と暫定値は「2.2」、追加確認による決定と残作業は「2.3」に分けた。元の4つの確認事項は解消済み。補足を変更した場合は設計書も更新する。
 
-GitHubの確認状況: 指定リポジトリをGitHubプラグインから取得でき、公開範囲がpublicであることを確認した。以前の参照失敗と公開範囲変更待ちは解消済み。GitHubへのpushとPagesでのアプリ公開は未実施であり、リポジトリの公開と混同しない。
+GitHubの確認状況: 指定リポジトリをGitHubプラグインから取得でき、公開範囲がpublicであることを確認した。以前の参照失敗と公開範囲変更待ちは解消済み。このPCのGit送信用認証も完了し、設計資料と履歴をGitHubへ反映できている。アプリ本体の実装とPagesでの公開は未実施であり、資料のpushとアプリ公開を混同しない。
 
 ## 2. 採用する構成
 
@@ -119,6 +120,7 @@ GitHubの確認状況: 指定リポジトリをGitHubプラグインから取得
 
 - 作業前の変更を保存・尊重する。Gitの設定や履歴を無関係に書き換えない。
 - 文書、基本操作と保存、フォルダ、カレンダー、通知、仕上げのように意味のある単位でコミットする。
+- Gitの変更はコミット後、指定リポジトリのリモートにも反映する。ローカルとリモートの反映状況を区別して報告する。
 - 各コミット前に差分を読み、git diff --checkを実施する。
 - 保存先は既存のereswi/todolist。新しいGitHubリポジトリを作らない。originのURLを確認して使う。
 - publicへの変更はユーザーが完了し、GitHubプラグインでも確認済み。公開範囲変更を未完了事項として扱わない。
