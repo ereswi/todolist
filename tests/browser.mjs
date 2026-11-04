@@ -211,10 +211,16 @@ for (const channel of ['chrome', 'msedge']) {
     expect(sent.map(n => n.title)).toEqual(['通知対象']);
     await check(page); await check(second);
     expect((await page.evaluate(() => window.sentNotifications.length)) + (await second.evaluate(() => window.sentNotifications.length))).toBe(1);
+    for (let attempt = 0; attempt < 20; attempt++) {
+      ready.tasks = [makeReminder(`同時実行 ${attempt}`)]; ready.inbox = [];
+      await page.evaluate(({ key, state }) => localStorage.setItem(key, JSON.stringify(state)), { key: STORAGE_KEY, state: ready });
+      await Promise.all([check(page), check(second)]);
+      expect((await page.evaluate(() => window.sentNotifications.length)) + (await second.evaluate(() => window.sentNotifications.length))).toBe(attempt + 2);
+    }
     await page.reload();
     await expect(page.locator('#reminder-items li')).toHaveCount(1);
     expect(await page.evaluate(() => window.sentNotifications.length)).toBe(0);
-    passed(`${channel}: cross-tab deduplication, completed/handled exclusion and reload persistence (OS transport stub)`);
+    passed(`${channel}: cross-tab deduplication (21 races), completed/handled exclusion and reload persistence (OS transport stub)`);
 
     await second.close();
     ready.tasks = [makeReminder('起動時の見逃し')]; ready.inbox = [];

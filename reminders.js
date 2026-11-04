@@ -1,4 +1,5 @@
 import { dueReminders } from './model.js';
+import { claimReminder } from './notification-claims.js';
 
 export function notificationStatus() {
   if (!('Notification' in globalThis)) return 'このブラウザーはOS通知に対応していません';
@@ -24,13 +25,18 @@ export function createReminders(store) {
         const due = dueReminders(state.tasks, now);
         for (const task of due) {
           task.reminderHandledAt = now.toISOString();
-          state.inbox.push({ id: `${task.id}:${task.remindAt}`, taskId: task.id, title: task.title, at: now.toISOString() });
+          const id = `${task.id}:${task.remindAt}`;
+          if (!state.inbox.some(item => item.id === id)) state.inbox.push({ id, taskId: task.id, title: task.title, at: now.toISOString() });
         }
         return due.map(task => ({ ...task }));
       });
       // Marking first, under the same lock as all edits, prevents duplicate delivery across tabs.
-      if (outcome.ok && !inAppOnly) {
-        for (const task of outcome.result) showOSNotification(task.title, `期限: ${task.dueDate} ${task.dueTime}`, `${task.id}:${task.remindAt}`);
+      if (outcome.ok) {
+        for (const task of outcome.result) {
+          const key = `${task.id}:${task.remindAt}`;
+          const claimed = await claimReminder(key);
+          if (claimed && !inAppOnly) showOSNotification(task.title, `期限: ${task.dueDate} ${task.dueTime}`, key);
+        }
       }
     } finally { busy = false; }
   }

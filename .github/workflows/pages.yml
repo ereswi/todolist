@@ -32,7 +32,7 @@ jobs:
       - name: Prepare only public application files
         run: |
           mkdir _site
-          cp index.html styles.css icon.svg app.js calendar.js model.js storage.js reminders.js .nojekyll _site/
+          cp index.html styles.css icon.svg app.js calendar.js model.js storage.js reminders.js notification-claims.js .nojekyll _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
