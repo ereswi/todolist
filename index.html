@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#267365">
+  <meta name="description" content="今日のやることから、これからの予定まで。ブラウザーに保存する、あなたのToDoリスト。">
+  <title>ToDoリスト — 今日を、ひとつずつ。</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="フォルダと設定">
+      <a class="brand" href="./" aria-label="ToDoリスト 今日へ"><span class="brand-mark">✓</span><span>ToDoリスト<small>今日を、ひとつずつ。</small></span></a>
+      <div class="sidebar-label">MY WORKSPACE</div>
+      <div class="folder-heading"><h2>フォルダ</h2><button id="manage-folders" class="icon-button" aria-label="フォルダを管理" title="フォルダを管理">＋</button></div>
+      <div id="folder-list" class="folder-list"></div>
+      <label class="mobile-folder">フォルダ<select id="mobile-folder"></select></label>
+      <div class="sidebar-bottom">
+        <button id="notification-settings" class="notification-button"><span aria-hidden="true">♧</span> 通知の設定<span class="status-dot"></span></button>
+        <div class="local-note"><span class="small-dot"></span> このブラウザーに保存<p>自分のペースで、少しずつ。</p></div>
+      </div>
+    </aside>
+    <main id="main">
+      <header class="topbar"><span id="today-label"></span><span id="save-status" role="status">読み込み中…</span></header>
+      <div class="content">
+        <nav class="view-tabs" aria-label="表示画面">
+          <button data-view="day" aria-current="page">一日のToDo</button>
+          <button data-view="tasks">タスク管理</button>
+          <button data-view="calendar">月カレンダー</button>
+        </nav>
+        <div id="storage-error" class="error-banner" role="alert" hidden><strong>データを保存・読み込みできません。</strong><p id="storage-error-detail"></p><button id="retry-storage">再読み込みを試す</button><span>入力中の内容は閉じずに残してください。</span></div>
+        <section id="reminder-inbox" class="reminder-inbox" aria-label="リマインド" hidden><div class="section-heading"><h2>リマインドのお知らせ</h2><button id="dismiss-reminders" class="text-button">確認済みにする</button></div><ul id="reminder-items"></ul></section>
+        <section class="page-heading"><div><p id="page-eyebrow" class="eyebrow">YOUR DAILY FOCUS</p><h1 id="page-title">今日のToDo</h1><p id="page-subtitle" class="subtitle"></p></div><button id="add-task" class="primary-button"><span aria-hidden="true">＋</span> タスクを追加</button></section>
+        <section id="daily-summary" class="daily-summary" aria-label="一日の進捗"><div class="summary-symbol" aria-hidden="true">✓</div><div class="summary-text"><strong id="summary-title"></strong><span id="summary-description"></span></div><div class="progress-area"><span id="progress-label"></span><div class="progress-track"><div id="progress-fill"></div></div></div></section>
+        <div class="toolbar"><div id="date-navigation" class="date-navigation"><button id="previous-date" class="icon-button" aria-label="前日">‹</button><button id="go-today">今日</button><button id="next-date" class="icon-button" aria-label="翌日">›</button><label id="date-picker-label"><span class="sr-only">表示する日付</span><input type="date" id="selected-date"></label></div><div id="list-controls" class="list-controls"><label><span class="sr-only">完了状態</span><select id="status-filter"><option value="all">すべての状態</option><option value="active">未完了</option><option value="completed">完了</option></select></label><label><span class="sr-only">並び順</span><select id="sort-order"><option value="due">期限が近い順</option><option value="newest">作成が新しい順</option><option value="oldest">作成が古い順</option><option value="title">タスク名順</option></select></label></div></div>
+        <section id="overdue-section" hidden><div class="section-heading"><h2>期限超過 <span id="overdue-count" class="count-badge"></span></h2><span class="section-caption">昨日までの未完了タスク</span></div><div id="overdue-list" class="task-list"></div></section>
+        <section id="tasks-section"><div class="section-heading"><h2 id="list-heading">今日のタスク</h2><span id="list-count" class="section-caption"></span></div><div id="task-list" class="task-list"></div><div id="empty-state" class="empty-state" hidden><div class="empty-icon" aria-hidden="true">✓</div><h3 id="empty-title"></h3><p id="empty-description"></p><button id="empty-add" class="text-button">＋ タスクを追加する</button></div></section>
+        <section id="calendar-section" hidden aria-label="月カレンダー"><p class="calendar-note">数字は未完了の件数。日付を選ぶと、その日のToDoへ移動します。</p><div class="weekdays" aria-hidden="true"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div id="calendar-grid" class="calendar-grid"></div><div class="calendar-legend"><span><i class="legend-today"></i>今日</span><span><i class="legend-selected"></i>選択日</span></div></section>
+        <button id="undated-link" class="undated-link"></button>
+        <footer class="page-footer">ひとつ終われば、ひとつ前へ。<span>通知はページを開いている間に届きます。</span></footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="task-dialog" aria-labelledby="task-dialog-title"><form id="task-form"><div class="dialog-heading"><div><p class="eyebrow">ONE THING AT A TIME</p><h2 id="task-dialog-title">タスクを追加</h2></div><button type="button" class="icon-button" data-close="task-dialog" aria-label="閉じる">×</button></div><label>タスクの内容 <span class="required">必須</span><input id="task-title" name="title" required maxlength="300" placeholder="何をしますか？" autocomplete="off"></label><label>フォルダ<select id="task-folder" name="folderId"></select></label><div class="form-row"><label>期限日<input type="date" id="task-date" name="dueDate" min="0001-01-01" max="9999-12-31"></label><label>期限時刻<input type="time" id="task-time" name="dueTime"></label></div><label>リマインド<select id="task-reminder" name="reminderMode"><option value="none">通知しない</option><option value="10m">10分前</option><option value="1h">1時間前</option><option value="1d">前日同時刻</option><option value="custom">日時を直接指定</option></select></label><label id="custom-reminder-label" hidden>通知日時<input id="task-custom-reminder" type="datetime-local" name="customReminder"></label><p class="field-hint">リマインドには期限日と時刻が必要です。通知は未来の日時で、期限より前に設定してください。</p><p id="task-form-error" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" data-close="task-dialog">キャンセル</button><button type="submit" class="primary-button" id="save-task">追加する</button></div></form></dialog>
+  <dialog id="folder-dialog" aria-labelledby="folder-dialog-title"><div class="dialog-heading"><h2 id="folder-dialog-title">フォルダを管理</h2><button class="icon-button" data-close="folder-dialog" aria-label="閉じる">×</button></div><p class="field-hint">削除したフォルダのタスクは、未分類に移動します。</p><div id="folder-editor"></div><form id="folder-form"><label for="folder-name">新しいフォルダ</label><div class="folder-create"><input id="folder-name" required maxlength="60" placeholder="フォルダ名" autocomplete="off"><button type="submit" class="primary-button">作成</button></div></form><p id="folder-form-error" class="form-error" role="alert"></p></dialog>
+  <dialog id="notification-dialog" aria-labelledby="notification-dialog-title"><div class="dialog-heading"><h2 id="notification-dialog-title">通知の設定</h2><button class="icon-button" data-close="notification-dialog" aria-label="閉じる">×</button></div><div class="notice-card"><strong id="notification-status"></strong><p>期限前のリマインドで、やることを忘れずに。</p></div><p>通知はこのページを開いている間のみ届きます。タブの休止やPCのスリープ、OSの設定によって遅れる・表示されない場合があります。</p><p>通知を許可しない場合も、画面内でお知らせします。ページを開き直した際に過ぎていた通知は、画面内でまとめて確認できます。</p><div class="dialog-actions"><button id="test-notification">通知をテスト</button><button id="enable-notifications" class="primary-button">通知を有効にする</button></div><p id="notification-feedback" role="status"></p></dialog>
+  <div id="toast" class="toast" role="status" hidden><span id="toast-message"></span><button id="undo-delete">元に戻す</button></div>
+  <noscript>このアプリにはJavaScriptが必要です。ブラウザーの設定で有効にしてください。</noscript>
+</body>
+</html>
