@@ -33,10 +33,13 @@ function storageError(error) {
 }
 // Access can itself throw in restricted browser contexts; defer it inside the store's try/catch.
 const storage = { getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) };
-const store = createStore(storage, navigator.locks, () => {
-  storageFailed = false;
-  $('storage-error').hidden = true;
-  $('save-status').textContent = '✓ ブラウザーに保存済み';
+const store = createStore(storage, navigator.locks, (_, source) => {
+  // A successful read cannot prove that a previously failed edit was saved.
+  if (!storageFailed || source === 'save') {
+    storageFailed = false;
+    $('storage-error').hidden = true;
+    $('save-status').textContent = '✓ ブラウザーに保存済み';
+  }
   render();
 }, storageError);
 const reminders = createReminders(store);
@@ -52,6 +55,7 @@ function renderFolders() {
   for (const item of items) {
     const count = store.state.tasks.filter(task => inFolder(task, item.id) && !task.completed).length;
     const element = button('', `folder-button${ui.folder === item.id ? ' active' : ''}`, () => { ui.folder = item.id; render(); });
+    element.dataset.folderId = item.id;
     element.setAttribute('aria-pressed', String(ui.folder === item.id));
     element.append(node('span', 'folder-icon', item.icon), node('span', 'folder-name', item.name), node('span', 'folder-count', count));
     $('folder-list').append(element);
@@ -88,10 +92,15 @@ function taskRow(task) {
   const actions = node('div', 'task-actions');
   const edit = button('編集', '', () => openTask(task.id)); edit.setAttribute('aria-label', `${task.title}を編集`);
   const remove = button('削除', '', () => deleteTask(task.id)); remove.setAttribute('aria-label', `${task.title}を削除`);
+  edit.dataset.action = 'edit'; remove.dataset.action = 'delete';
   actions.append(edit, remove); row.append(check, content, actions);
   return row;
 }
 function render() {
+  const focused = document.activeElement;
+  const focusTask = focused?.closest('.task-row')?.dataset.taskId;
+  const focusAction = focused?.dataset.action;
+  const focusFolder = focused?.dataset.folderId;
   renderFolders();
   const today = dateKey();
   const isToday = ui.date === today;
@@ -144,6 +153,13 @@ function render() {
   const inbox = store.state.inbox;
   $('reminder-inbox').hidden = !inbox.length;
   $('reminder-items').replaceChildren(...inbox.map(item => node('li', '', `${item.title} — ${new Date(item.at).toLocaleString('ja-JP')}`)));
+  if (focusTask) {
+    const row = [...document.querySelectorAll('.task-row')].find(row => row.dataset.taskId === focusTask);
+    const target = focusAction ? [...(row?.querySelectorAll('button') || [])].find(button => button.dataset.action === focusAction) : row?.querySelector('input');
+    (target || $('add-task')).focus({ preventScroll: true });
+  } else if (focusFolder) {
+    [...document.querySelectorAll('[data-folder-id]')].find(element => element.dataset.folderId === focusFolder)?.focus({ preventScroll: true });
+  }
 }
 function renderCalendar(tasks) {
   $('calendar-grid').replaceChildren(...monthDays(ui.month).map(date => {

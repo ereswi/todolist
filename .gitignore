@@ -11,6 +11,7 @@ build/
 coverage/
 test-results/
 playwright-report/
+_site/
 
 # Logs / local configuration / secrets
 *.log

@@ -9,7 +9,7 @@ export function createStore(storage, locks, onChange, onError) {
     return raw === null ? emptyState() : validateState(JSON.parse(raw));
   };
   const refresh = () => {
-    try { state = read(); onChange(state); return true; }
+    try { state = read(); onChange(state, 'load'); return true; }
     catch (error) { onError(error); return false; }
   };
   const update = async mutator => {
@@ -20,7 +20,7 @@ export function createStore(storage, locks, onChange, onError) {
         validateState(draft);
         storage.setItem(STORAGE_KEY, JSON.stringify(draft));
         state = draft;
-        onChange(state);
+        onChange(state, 'save');
         return { ok: true, result };
       } catch (error) { onError(error); return { ok: false }; }
     };
