@@ -1,0 +1,23 @@
+# OS / editor temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Dependencies / generated output
+node_modules/
+dist/
+build/
+coverage/
+test-results/
+playwright-report/
+
+# Logs / local configuration / secrets
+*.log
+.env
+.env.*
+!.env.example
+
+# Local runtime data (never commit actual task data)
+.local-data/
+.local-state/
